@@ -237,7 +237,7 @@ namespace Sender_10300_10311
                         StringBuilder sb = new StringBuilder();
                         foreach(ListViewItem item in listView1.Items)
                         {
-                            sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text + "" + item.SubItems[3].Text + "" + item.SubItems[4].Text);
+                            sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text + "" + "91" + item.SubItems[3].Text + "" + "92" + item.SubItems[4].Text);
                         }
                         await sw.WriteLineAsync(sb.ToString());
                         
