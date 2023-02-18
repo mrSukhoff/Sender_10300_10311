@@ -78,11 +78,11 @@ namespace Sender_10300_10311
                 //manufacturedData = Convert.ToString(sqlReader["CloseTime"]);
                    
                 if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
-                textBox2.Text = expDate;
-                textBox1.Text = Convert.ToString(sqlReader["CloseTime"]);
+                ExpiredTextBox.Text = expDate;
+                ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
                 //if (manufacturedData != "") { manufacturedData = manufacturedData.Substring(6, 2) + "." + manufacturedData.Substring(4, 2) + "." + manufacturedData.Substring(0, 4); }
                     // textBox1.Text = manufacturedData;
-                lotBox.Text = Convert.ToString(sqlReader["Lot"]);
+                LotBox.Text = Convert.ToString(sqlReader["Lot"]);
 
                 }
 
@@ -143,11 +143,11 @@ namespace Sender_10300_10311
                     //manufacturedData = Convert.ToString(sqlReader["CloseTime"]);
 
                     if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
-                    textBox2.Text = expDate;
-                    textBox1.Text = Convert.ToString(sqlReader["CloseTime"]);
+                    ExpiredTextBox.Text = expDate;
+                    ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
                     //if (manufacturedData != "") { manufacturedData = manufacturedData.Substring(6, 2) + "." + manufacturedData.Substring(4, 2) + "." + manufacturedData.Substring(0, 4); }
                     // textBox1.Text = manufacturedData;
-                    lotBox.Text = Convert.ToString(sqlReader["Lot"]);
+                    LotBox.Text = Convert.ToString(sqlReader["Lot"]);
 
                 }
 
@@ -172,8 +172,8 @@ namespace Sender_10300_10311
           //  antGTIN = null;
             //antSerial = null;
 
-            antGTIN = gtinBox.Text;
-            antSerial = serialnumberBox.Text;
+            antGTIN = GtinBox.Text;
+            antSerial = SerialNumberBox.Text;
             bool proverkaSerial = true;
 
 
@@ -182,7 +182,7 @@ namespace Sender_10300_10311
             foreach (ListViewItem item in listView1.Items)
             {
 
-                if (item.SubItems[2].Text == serialnumberBox.Text)
+                if (item.SubItems[2].Text == SerialNumberBox.Text)
                 {
 
 
@@ -194,36 +194,36 @@ namespace Sender_10300_10311
 
             if(proverkaSerial == true)
             {
-                if (comboBox1.Text == "Тестовый")
+                if (ServerComboBox.Text == "Тестовый")
                 {
-                    IdZavodtbox.Text = "00000000106567";
+                    SubjectIdBox.Text = "00000000106567";
                     sqlConnection = new SqlConnection("Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_QA].[dbo].";
                 }
 
-                if (comboBox1.Text == "Тюмень")
+                if (ServerComboBox.Text == "Тюмень")
                 {
-                    IdZavodtbox.Text = "00000000160656";
+                    SubjectIdBox.Text = "00000000160656";
                     sqlConnection = new SqlConnection("Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
-                if (comboBox1.Text == "Иркутск")
+                if (ServerComboBox.Text == "Иркутск")
                 {
-                    IdZavodtbox.Text = "00000000003013";
+                    SubjectIdBox.Text = "00000000003013";
                     sqlConnection = new SqlConnection("Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
 
-                if (comboBox1.Text == "Питер")
+                if (ServerComboBox.Text == "Питер")
                 {
-                    IdZavodtbox.Text = "00000000197244";
+                    SubjectIdBox.Text = "00000000197244";
                     sqlConnection = new SqlConnection("Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
 
-                if (comboBox1.Text == "Усурийск")
+                if (ServerComboBox.Text == "Усурийск")
                 {
-                    IdZavodtbox.Text = "00000000253549";
+                    SubjectIdBox.Text = "00000000253549";
                     sqlConnection = new SqlConnection("Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
@@ -231,11 +231,11 @@ namespace Sender_10300_10311
 
                 await sqlConnection.OpenAsync();
                 await LoadAntaresAsync();
-                countOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad - 1);
+                CountOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad - 1);
             }
 
             sgtinBox.Text = null;
-            serialnumberBox.Text = null;
+            SerialNumberBox.Text = null;
 
         }
 
@@ -261,23 +261,23 @@ namespace Sender_10300_10311
             
            
             
-            textBox1.Text = null;
-            textBox2.Text = null;
-            lotBox.Text = null;
+            ManufacturingDateBox.Text = null;
+            ExpiredTextBox.Text = null;
+            LotBox.Text = null;
             listView1.Items.Clear();
-            button1.Enabled = true;
-            button3.Enabled = true;
-            button4.Enabled = true;
+            ManualAddButton.Enabled = true;
+            LoadFromTxtButton.Enabled = true;
+            LoadWODataButton.Enabled = true;
             countOfSgtinLoad = 1;
-            countOfSgtinLoadBox.Text = "0";
+            CountOfSgtinLoadBox.Text = "0";
             sgtinBox.Text = null;
-            gtinBox.Text = null;
-            serialnumberBox.Text = null;
-            workorderIDTextbox.Text = null;
+            GtinBox.Text = null;
+            SerialNumberBox.Text = null;
+            WorkorderIdTextBox.Text = null;
 
             antGTIN = null;
             antSerial = null;
-            IdZavodtbox.Text = null;
+            SubjectIdBox.Text = null;
             textBox3.Text = null;
 
 
@@ -290,7 +290,7 @@ namespace Sender_10300_10311
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog sdf = new SaveFileDialog() { Filter = "CSV|*.CSV", FileName = lotBox.Text})
+            using (SaveFileDialog sdf = new SaveFileDialog() { Filter = "CSV|*.CSV", FileName = LotBox.Text})
             {
                 if(sdf.ShowDialog() == DialogResult.OK)
                 {
@@ -358,36 +358,36 @@ namespace Sender_10300_10311
                         antGTIN = temp.Substring(0, 14);
                         antSerial = temp.Substring(14, 13);
 
-                        if (comboBox1.Text == "Тестовый")
+                        if (ServerComboBox.Text == "Тестовый")
                         {
-                            IdZavodtbox.Text = "00000000106567";
+                            SubjectIdBox.Text = "00000000106567";
                             sqlConnection = new SqlConnection("Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav");
                             antServerTable = "[AntaresTracking_QA].[dbo].";
                         }
 
-                        if (comboBox1.Text == "Тюмень")
+                        if (ServerComboBox.Text == "Тюмень")
                         {
-                            IdZavodtbox.Text = "00000000160656";
+                            SubjectIdBox.Text = "00000000160656";
                             sqlConnection = new SqlConnection("Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                             antServerTable = "[AntaresTracking_PRD].[dbo].";
                         }
-                        if (comboBox1.Text == "Иркутск")
+                        if (ServerComboBox.Text == "Иркутск")
                         {
-                            IdZavodtbox.Text = "00000000003013";
+                            SubjectIdBox.Text = "00000000003013";
                             sqlConnection = new SqlConnection("Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                             antServerTable = "[AntaresTracking_PRD].[dbo].";
                         }
 
-                        if (comboBox1.Text == "Питер")
+                        if (ServerComboBox.Text == "Питер")
                         {
-                            IdZavodtbox.Text = "00000000197244";
+                            SubjectIdBox.Text = "00000000197244";
                             sqlConnection = new SqlConnection("Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                             antServerTable = "[AntaresTracking_PRD].[dbo].";
                         }
 
-                        if (comboBox1.Text == "Усурийск")
+                        if (ServerComboBox.Text == "Усурийск")
                         {
-                            IdZavodtbox.Text = "00000000253549";
+                            SubjectIdBox.Text = "00000000253549";
                             sqlConnection = new SqlConnection("Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                             antServerTable = "[AntaresTracking_PRD].[dbo].";
                         }
@@ -403,7 +403,7 @@ namespace Sender_10300_10311
                             
                     }
 
-                    countOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad -1);
+                    CountOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad -1);
                     if (countOfSgtinLoad - 1 == countOfSgtinLoadErr)
                     {
                         MessageBox.Show("Загружено " + Convert.ToString(countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr));
@@ -415,11 +415,11 @@ namespace Sender_10300_10311
                 foreach (ListViewItem item in listView1.Items)
                 {
 
-                    if (item.SubItems[7].Text != lotBox.Text)
+                    if (item.SubItems[7].Text != LotBox.Text)
                     {
 
 
-                        MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + lotBox.Text);
+                        MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + LotBox.Text);
                         break;
                     }
                 }
@@ -433,67 +433,67 @@ namespace Sender_10300_10311
 
             if (sgtinBox.Text != null && sgtinBox.Text.Length ==27) 
             { 
-            gtinBox.Text = sgtinBox.Text.Substring(0, 14);
-            serialnumberBox.Text = sgtinBox.Text.Substring(14, 13);
+            GtinBox.Text = sgtinBox.Text.Substring(0, 14);
+            SerialNumberBox.Text = sgtinBox.Text.Substring(14, 13);
             }
         }
 
         private async void  button4_Click(object sender, EventArgs e)
         {
 
-            textBox1.Text = null;
-            textBox2.Text = null;
-            lotBox.Text = null;
+            ManufacturingDateBox.Text = null;
+            ExpiredTextBox.Text = null;
+            LotBox.Text = null;
             listView1.Items.Clear();
-            button1.Enabled = true;
-            button3.Enabled = true;
-            button4.Enabled = true;
+            ManualAddButton.Enabled = true;
+            LoadFromTxtButton.Enabled = true;
+            LoadWODataButton.Enabled = true;
             countOfSgtinLoad = 1;
-            countOfSgtinLoadBox.Text = "0";
+            CountOfSgtinLoadBox.Text = "0";
             sgtinBox.Text = null;
-            gtinBox.Text = null;
-            serialnumberBox.Text = null;
+            GtinBox.Text = null;
+            SerialNumberBox.Text = null;
 
 
-            if (comboBox1.Text == "Тестовый")
+            if (ServerComboBox.Text == "Тестовый")
                 {
-                    IdZavodtbox.Text = "00000000106567";
+                    SubjectIdBox.Text = "00000000106567";
                     sqlConnection = new SqlConnection("Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_QA].[dbo].";
                 }
 
-                if (comboBox1.Text == "Тюмень")
+                if (ServerComboBox.Text == "Тюмень")
                 {
-                    IdZavodtbox.Text = "00000000160656";
+                    SubjectIdBox.Text = "00000000160656";
                     sqlConnection = new SqlConnection("Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
-                if (comboBox1.Text == "Иркутск")
+                if (ServerComboBox.Text == "Иркутск")
                 {
-                    IdZavodtbox.Text = "00000000003013";
+                    SubjectIdBox.Text = "00000000003013";
                     sqlConnection = new SqlConnection("Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
 
-                if (comboBox1.Text == "Питер")
+                if (ServerComboBox.Text == "Питер")
                 {
-                    IdZavodtbox.Text = "00000000197244";
+                    SubjectIdBox.Text = "00000000197244";
                     sqlConnection = new SqlConnection("Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
 
-                if (comboBox1.Text == "Усурийск")
+                if (ServerComboBox.Text == "Усурийск")
                 {
-                    IdZavodtbox.Text = "00000000253549";
+                    SubjectIdBox.Text = "00000000253549";
                     sqlConnection = new SqlConnection("Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
                     antServerTable = "[AntaresTracking_PRD].[dbo].";
                 }
 
-                workorderID = workorderIDTextbox.Text;
+                workorderID = WorkorderIdTextBox.Text;
 
                 await sqlConnection.OpenAsync();
                 await LoadAntaresAsync1();
-                countOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad - 1);
+                CountOfSgtinLoadBox.Text = Convert.ToString(countOfSgtinLoad - 1);
             
         }
 
