@@ -52,6 +52,9 @@ namespace Sender_10300_10311
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.countOfSgtinLoadBox = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.workorderIDTextbox = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // gtinBox
@@ -231,9 +234,9 @@ namespace Sender_10300_10311
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(672, 202);
+            this.button2.Location = new System.Drawing.Point(672, 227);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(175, 70);
+            this.button2.Size = new System.Drawing.Size(175, 50);
             this.button2.TabIndex = 23;
             this.button2.Text = "Сохранить в CSV";
             this.button2.UseVisualStyleBackColor = true;
@@ -242,9 +245,9 @@ namespace Sender_10300_10311
             // button3
             // 
             this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(672, 90);
+            this.button3.Location = new System.Drawing.Point(672, 149);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(175, 70);
+            this.button3.Size = new System.Drawing.Size(175, 57);
             this.button3.TabIndex = 24;
             this.button3.Text = "Загрузить из файла TXT";
             this.button3.UseVisualStyleBackColor = true;
@@ -276,11 +279,44 @@ namespace Sender_10300_10311
             this.countOfSgtinLoadBox.Size = new System.Drawing.Size(191, 24);
             this.countOfSgtinLoadBox.TabIndex = 26;
             // 
+            // button4
+            // 
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(672, 77);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(175, 53);
+            this.button4.TabIndex = 29;
+            this.button4.Text = "Загрузить данные по Workorder";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // workorderIDTextbox
+            // 
+            this.workorderIDTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.workorderIDTextbox.Location = new System.Drawing.Point(672, 37);
+            this.workorderIDTextbox.Name = "workorderIDTextbox";
+            this.workorderIDTextbox.Size = new System.Drawing.Size(175, 24);
+            this.workorderIDTextbox.TabIndex = 30;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label10.Location = new System.Drawing.Point(669, 16);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(80, 18);
+            this.label10.TabIndex = 31;
+            this.label10.Text = "Workorder";
+            this.label10.Click += new System.EventHandler(this.label10_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1090, 581);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.workorderIDTextbox);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.countOfSgtinLoadBox);
             this.Controls.Add(this.textBox3);
@@ -338,6 +374,9 @@ namespace Sender_10300_10311
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox countOfSgtinLoadBox;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox workorderIDTextbox;
+        private System.Windows.Forms.Label label10;
     }
 }
 
