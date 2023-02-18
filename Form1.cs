@@ -24,48 +24,46 @@ namespace Sender_10300_10311
             InitializeComponent();
         }
 
+        // Удаление соединения при закрытии формы
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_sqlConnection != null && _sqlConnection.State != ConnectionState.Closed)
                 _sqlConnection.Close();
         }
 
+        
         private async Task LoadAntaresAsync() //SELECT
         {
-            string expDate, manufacturedData = null;
-            SqlDataReader sqlReader = null;
-            //SqlCommand getAntaresCommand = new SqlCommand("SELECT [Serial] ,[CryptoKey], [CryptoCode] ,[Ntin],[Expiry] FROM " + antServerTable + " where Serial =" + "'" + antSerial + "'" + "and Ntin = " + "'" + antGTIN + "'", sqlConnection);
+            SqlDataReader sqlReader;
+
+            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
+            string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
+                $" FROM [Item_All_Crypto] as i" +
+                $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
+                $" WHERE Serial = '{_antSerial}' and Ntin = '{_antGTIN}'"; 
+            SqlCommand getAntaresCommand = new SqlCommand(query, _sqlConnection);
             
-            SqlCommand getAntaresCommand = new SqlCommand("SELECT  "+ _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'", _sqlConnection);
-            
-
-
-
+            string expDate;
             try
             {
                 sqlReader = await getAntaresCommand.ExecuteReaderAsync();
                 while (await sqlReader.ReadAsync())
                 {
-                    
-                     
-                   
-                    ListViewItem item = new ListViewItem(new string[]{
-                    Convert.ToString(_countOfSgtinLoad),
-                    Convert.ToString(sqlReader["Ntin"]),
-                    Convert.ToString(sqlReader["Serial"]),
-                    Convert.ToString(sqlReader["CryptoKey"]),
-                    Convert.ToString(sqlReader["CryptoCode"]),
-                    Convert.ToString(sqlReader["Expiry"]),
-                    Convert.ToString(sqlReader["CloseTime"]),
-                    Convert.ToString(sqlReader["Lot"]),
-                    Convert.ToString(sqlReader["Status"])
-                    
-
-                });
-                    _countOfSgtinLoad++;
-
+                    var item = new ListViewItem(
+                        new string[]
+                        {
+                            Convert.ToString(_countOfSgtinLoad),
+                            Convert.ToString(sqlReader["Ntin"]),
+                            Convert.ToString(sqlReader["Serial"]),
+                            Convert.ToString(sqlReader["CryptoKey"]),
+                            Convert.ToString(sqlReader["CryptoCode"]),
+                            Convert.ToString(sqlReader["Expiry"]),
+                            Convert.ToString(sqlReader["CloseTime"]),
+                            Convert.ToString(sqlReader["Lot"]),
+                            Convert.ToString(sqlReader["Status"])
+                        });
+                _countOfSgtinLoad++;
                 listView1.Items.Add(item);
-                    
 
                 expDate = Convert.ToString(sqlReader["Expiry"]);
                 //manufacturedData = Convert.ToString(sqlReader["CloseTime"]);
@@ -78,8 +76,6 @@ namespace Sender_10300_10311
                 LotBox.Text = Convert.ToString(sqlReader["Lot"]);
 
                 }
-
-
             }
             catch (Exception ex)
             {
