@@ -60,18 +60,18 @@ namespace Sender_10300_10311
 
         private async void ManualAddButton_Click(object sender, EventArgs e)
         {
-            bool proverkaSerial = true;
+            bool IsSerialUniq = true;
 
             foreach (ListViewItem item in SgtinListView.Items)
             {
                 if (item.SubItems[2].Text == SerialNumberBox.Text)
                 {
                    MessageBox.Show("Серийный номер  номер уже присутствует в списке");
-                    proverkaSerial = false;
+                   IsSerialUniq = false;
                 }
             }
 
-            if(proverkaSerial == true)
+            if(IsSerialUniq)
             {
                 SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
                 SubjectIdBox.Text = subjectId;
@@ -100,20 +100,17 @@ namespace Sender_10300_10311
 
         private async void Save2CsvButton_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog sdf = new SaveFileDialog() { Filter = "CSV|*.CSV", FileName = LotBox.Text})
+            SaveFileDialog dialog = new SaveFileDialog() { Filter = "CSV|*.CSV", FileName = LotBox.Text };
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+                
+            using (StreamWriter sw = new StreamWriter(new FileStream(dialog.FileName, FileMode.Create), Encoding.UTF8))
             {
-                if(sdf.ShowDialog() == DialogResult.OK)
+                StringBuilder sb = new StringBuilder();
+                foreach(ListViewItem item in SgtinListView.Items)
                 {
-                    using (StreamWriter sw = new StreamWriter(new FileStream(sdf.FileName, FileMode.Create), Encoding.UTF8))
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        foreach(ListViewItem item in SgtinListView.Items)
-                        {
-                            sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text );
-                        }
-                        await sw.WriteLineAsync(sb.ToString());
-                    }
+                    sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text );
                 }
+                await sw.WriteLineAsync(sb.ToString());
             }
         }
 
