@@ -14,9 +14,7 @@ namespace Sender_10300_10311
         private string _antGTIN;
         private int _countOfSgtinLoad = 1;
         private string _workorderID;
-        
-        //private string _sqlConnectionString;
-
+ 
         public Sender10311Form()
         {
             InitializeComponent();
