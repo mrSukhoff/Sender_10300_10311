@@ -16,7 +16,7 @@ namespace Sender_10300_10311
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Sender10311Form());
         }
     }
 }

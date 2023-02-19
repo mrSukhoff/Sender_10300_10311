@@ -1,7 +1,7 @@
 ﻿
 namespace Sender_10300_10311
 {
-    partial class Form1
+    partial class Sender10311Form
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -247,7 +247,7 @@ namespace Sender_10300_10311
             this.sgtinBox.Name = "sgtinBox";
             this.sgtinBox.Size = new System.Drawing.Size(304, 24);
             this.sgtinBox.TabIndex = 21;
-            this.sgtinBox.TextChanged += new System.EventHandler(this.sgtinBox_TextChanged);
+            this.sgtinBox.TextChanged += new System.EventHandler(this.SgtinBox_TextChanged);
             // 
             // Save2CsvButton
             // 
@@ -333,7 +333,7 @@ namespace Sender_10300_10311
             this.label10.TabIndex = 31;
             this.label10.Text = "Workorder";
             // 
-            // Form1
+            // Sender10311Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -365,9 +365,8 @@ namespace Sender_10300_10311
             this.Controls.Add(this.label1);
             this.Controls.Add(this.GtinBox);
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "Form1";
+            this.Name = "Sender10311Form";
             this.Text = "Отправитель 10311";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
