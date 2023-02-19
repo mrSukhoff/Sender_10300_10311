@@ -15,14 +15,14 @@ namespace Sender_10300_10311
         private int _countOfSgtinLoad = 1;
         private string _workorderID;
         
-        private string _sqlConnectionString;
+        //private string _sqlConnectionString;
 
         public Sender10311Form()
         {
             InitializeComponent();
         }
                 
-        private async Task LoadFromAntaresBySgtinAndFillFormAsync()
+        private async Task LoadFromAntaresBySgtinAndFillFormAsync(string connectionString)
         {
             //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
             string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
@@ -30,60 +30,52 @@ namespace Sender_10300_10311
                 $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
                 $" WHERE Serial = '{_antSerial}' and Ntin = '{_antGTIN}'";
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(connectionString))
             {
-                SqlCommand getAntaresCommand = new SqlCommand(query, connection);
-
                 await connection.OpenAsync();
+                SqlCommand getAntaresCommand = new SqlCommand(query, connection);
                 using (SqlDataReader sqlReader = await getAntaresCommand.ExecuteReaderAsync())
                 {
-                    try
+                    while (await sqlReader.ReadAsync())
                     {
-                        while (await sqlReader.ReadAsync())
+                        SgtinListView.Items.Add(new ListViewItem(new string[]
                         {
-                            SgtinListView.Items.Add(new ListViewItem(new string[]
-                            {
-                            Convert.ToString(_countOfSgtinLoad),
-                            Convert.ToString(sqlReader["Ntin"]),
-                            Convert.ToString(sqlReader["Serial"]),
-                            Convert.ToString(sqlReader["CryptoKey"]),
-                            Convert.ToString(sqlReader["CryptoCode"]),
-                            Convert.ToString(sqlReader["Expiry"]),
-                            Convert.ToString(sqlReader["CloseTime"]),
-                            Convert.ToString(sqlReader["Lot"]),
-                            Convert.ToString(sqlReader["Status"])
-                            }));
+                        Convert.ToString(_countOfSgtinLoad),
+                        Convert.ToString(sqlReader["Ntin"]),
+                        Convert.ToString(sqlReader["Serial"]),
+                        Convert.ToString(sqlReader["CryptoKey"]),
+                        Convert.ToString(sqlReader["CryptoCode"]),
+                        Convert.ToString(sqlReader["Expiry"]),
+                        Convert.ToString(sqlReader["CloseTime"]),
+                        Convert.ToString(sqlReader["Lot"]),
+                        Convert.ToString(sqlReader["Status"])
+                        }));
 
-                            var expDate = Convert.ToString(sqlReader["Expiry"]);
-                            if (expDate != "")
-                            {
-                                expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4);
-                            }
-                            ExpiredTextBox.Text = expDate;
-
-                            ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
-
-                            LotBox.Text = Convert.ToString(sqlReader["Lot"]);
-
-                            _countOfSgtinLoad++;
+                        var expDate = Convert.ToString(sqlReader["Expiry"]);
+                        if (expDate != "")
+                        {
+                            expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4);
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ExpiredTextBox.Text = expDate;
+
+                        ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
+
+                        LotBox.Text = Convert.ToString(sqlReader["Lot"]);
+
+                        _countOfSgtinLoad++;
                     }
                 }
             }
         }
 
-        private async Task LoadFromAntaresByWorkorderAndFillFormAsync()
+        private async Task LoadFromAntaresByWorkorderAndFillFormAsync(string connectionString)
         {
             //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[WorkOrderID] = '"+ _workorderID + "' and " + _antServerTable + "[Item_All_Crypto].[Type] = '100' and " + _antServerTable + "[Item_All_Crypto].[Status] in( '10','1') "
             var query = "SELECT  i.Serial, i.Status, i.WorkOrderID, i.CryptoKey, i.CryptoCode, w.Expiry, i.Ntin, w.Lot, w.CloseTime" +
                 " FROM Item_All_Crypto as i  JOIN WorkOrder as ON w.Id = i.WorkOrderID" +
                 $" Where i.WorkOrderID = '{_workorderID} and i.Type = '100' and i.Status in( '10','1') ";
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
                 SqlCommand getAntaresCommand = new SqlCommand(query, connection);
@@ -140,33 +132,18 @@ namespace Sender_10300_10311
 
             if(proverkaSerial == true)
             {
-                if (ServerComboBox.Text == "Тестовый")
-                {
-                    SubjectIdBox.Text = "00000000106567";
-                    _sqlConnectionString = "Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav";
-                }
-                if (ServerComboBox.Text == "Тюмень")
-                {
-                    SubjectIdBox.Text = "00000000160656";
-                    _sqlConnectionString = "Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
-                if (ServerComboBox.Text == "Иркутск")
-                {
-                    SubjectIdBox.Text = "00000000003013";
-                    _sqlConnectionString = "Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
-                if (ServerComboBox.Text == "Питер")
-                {
-                    SubjectIdBox.Text = "00000000197244";
-                    _sqlConnectionString = "Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
-                if (ServerComboBox.Text == "Усурийск")
-                {
-                    SubjectIdBox.Text = "00000000253549";
-                    _sqlConnectionString = "Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
+                SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
+                SubjectIdBox.Text = subjectId;
 
-                await LoadFromAntaresBySgtinAndFillFormAsync();
+                try
+                {
+                    await LoadFromAntaresBySgtinAndFillFormAsync(connectionString);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                };
+
                 CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
             }
 
@@ -174,7 +151,7 @@ namespace Sender_10300_10311
             SerialNumberBox.Text = null;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Sender10311Form_Load(object sender, EventArgs e)
         {
             SgtinListView.GridLines = true;
             SgtinListView.FullRowSelect = true;
@@ -209,7 +186,7 @@ namespace Sender_10300_10311
             _antGTIN = null;
             _antSerial = null;
             SubjectIdBox.Text = null;
-            textBox3.Text = null;
+            SgtinListTextBox.Text = null;
         }
 
         private async void Save2CsvButton_Click(object sender, EventArgs e)
@@ -233,7 +210,7 @@ namespace Sender_10300_10311
 
         private async void LoadFromTxtButton_Click(object sender, EventArgs e)
         {
-            textBox3.Text = null;
+            SgtinListTextBox.Text = null;
             SgtinListView.Items.Clear();
             using (OpenFileDialog openFileDialog1 = new OpenFileDialog() { Filter = "TXT|*.TXT" })
             { 
@@ -250,70 +227,48 @@ namespace Sender_10300_10311
                         // Если достигнут конец файла, прерываем считывание.
                         if (temp == null) break;
 
-                        if (temp != "" && temp.Length == 27) { 
-                        // Пишем считанную строку в итоговую переменную.
-                        textBox3.Text += temp + "\n";
-                      
-                        _antGTIN = temp.Substring(0, 14);
-                        _antSerial = temp.Substring(14, 13);
-
-                        if (ServerComboBox.Text == "Тестовый")
+                        if (temp != "" && temp.Length == 27)
                         {
-                            SubjectIdBox.Text = "00000000106567";
-                            _sqlConnectionString = "Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav";
+                            // Пишем считанную строку в итоговую переменную.
+                            SgtinListTextBox.Text += temp + "\n";
+
+                            _antGTIN = temp.Substring(0, 14);
+                            _antSerial = temp.Substring(14, 13);
+
+                            SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
+                            SubjectIdBox.Text = subjectId;
+
+                            try
+                            {
+                                await LoadFromAntaresBySgtinAndFillFormAsync(connectionString);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            };
+
+                            if (temp != "") { countOfSgtinLoadErr++; }
                         }
 
-                        if (ServerComboBox.Text == "Тюмень")
+                        CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
+                        if (_countOfSgtinLoad - 1 == countOfSgtinLoadErr)
                         {
-                            SubjectIdBox.Text = "00000000160656";
-                            _sqlConnectionString = "Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
+                            MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr));
                         }
-                        if (ServerComboBox.Text == "Иркутск")
-                        {
-                            SubjectIdBox.Text = "00000000003013";
-                            _sqlConnectionString = "Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                        }
+                        else { MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr) + "\n Проверьте длину SGTIN"); }
 
-                        if (ServerComboBox.Text == "Питер")
-                        {
-                            SubjectIdBox.Text = "00000000197244";
-                            _sqlConnectionString = "Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                        }
-
-                        if (ServerComboBox.Text == "Усурийск")
-                        {
-                            SubjectIdBox.Text = "00000000253549";
-                            _sqlConnectionString = "Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                        }
-
-                        await LoadFromAntaresBySgtinAndFillFormAsync();
-                        }
-
-                        if (temp != "") { countOfSgtinLoadErr++; }
                     }
 
-                    CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad -1);
-                    if (_countOfSgtinLoad - 1 == countOfSgtinLoadErr)
-                    {
-                        MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr));
-                    }
-                    else { MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr) + "\n Проверьте длину SGTIN"); }
-
-                }
-
-                foreach (ListViewItem item in SgtinListView.Items)
-                {
-
-                    if (item.SubItems[7].Text != LotBox.Text)
+                    foreach (ListViewItem item in SgtinListView.Items)
                     {
 
-
-                        MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + LotBox.Text);
-                        break;
+                        if (item.SubItems[7].Text != LotBox.Text)
+                        {
+                            MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + LotBox.Text);
+                            break;
+                        }
                     }
                 }
-
-
             }
         }
 
@@ -342,40 +297,51 @@ namespace Sender_10300_10311
             GtinBox.Text = null;
             SerialNumberBox.Text = null;
 
+            SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
+            SubjectIdBox.Text = subjectId;
 
-            if (ServerComboBox.Text == "Тестовый")
-                {
-                    SubjectIdBox.Text = "00000000106567";
-                    _sqlConnectionString = "Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav";
-                }
+            _workorderID = WorkorderIdTextBox.Text;
+            try
+            {
+                await LoadFromAntaresByWorkorderAndFillFormAsync(connectionString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            };
 
-                if (ServerComboBox.Text == "Тюмень")
-                {
-                    SubjectIdBox.Text = "00000000160656";
-                    _sqlConnectionString = "Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
-                if (ServerComboBox.Text == "Иркутск")
-                {
-                    SubjectIdBox.Text = "00000000003013";
-                    _sqlConnectionString = "Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
+            CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
+        }
 
-                if (ServerComboBox.Text == "Питер")
-                {
-                    SubjectIdBox.Text = "00000000197244";
-                    _sqlConnectionString = "Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
+        private void SelectServer(string ServerName, out string SubjectId, out string ConnectionString) 
+        {
+            switch (ServerName)
+            {
+                case "Тестовый":
+                    SubjectId = "00000000106567";
+                    ConnectionString = "Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav";
+                    break;
 
-                if (ServerComboBox.Text == "Усурийск")
-                {
-                    SubjectIdBox.Text = "00000000253549";
-                    _sqlConnectionString = "Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
-                }
+                case "Тюмень":
 
-                _workorderID = WorkorderIdTextBox.Text;
-                await LoadFromAntaresByWorkorderAndFillFormAsync();
-                CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
-            
+                    SubjectId = "00000000160656";
+                    ConnectionString = "Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
+                    break;
+                case "Иркутск":
+                    SubjectId = "00000000003013";
+                    ConnectionString = "Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
+                    break;
+
+                case "Питер":
+                    SubjectId = "00000000197244";
+                    ConnectionString = "Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
+                    break;
+                case "Усурийск":
+                    SubjectId = "00000000253549";
+                    ConnectionString = "Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav";
+                    break;
+                default: throw new ArgumentException("Некоректное имя сервера");
+            }
         }
     }
 }

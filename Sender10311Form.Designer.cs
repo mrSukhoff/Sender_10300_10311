@@ -49,7 +49,7 @@ namespace Sender_10300_10311
             this.sgtinBox = new System.Windows.Forms.TextBox();
             this.Save2CsvButton = new System.Windows.Forms.Button();
             this.LoadFromTxtButton = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.SgtinListTextBox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.CountOfSgtinLoadBox = new System.Windows.Forms.TextBox();
             this.LoadWODataButton = new System.Windows.Forms.Button();
@@ -272,14 +272,14 @@ namespace Sender_10300_10311
             this.LoadFromTxtButton.UseVisualStyleBackColor = true;
             this.LoadFromTxtButton.Click += new System.EventHandler(this.LoadFromTxtButton_Click);
             // 
-            // textBox3
+            // SgtinListTextBox
             // 
-            this.textBox3.Location = new System.Drawing.Point(1181, 12);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(243, 328);
-            this.textBox3.TabIndex = 25;
+            this.SgtinListTextBox.Location = new System.Drawing.Point(1181, 12);
+            this.SgtinListTextBox.Margin = new System.Windows.Forms.Padding(4);
+            this.SgtinListTextBox.Multiline = true;
+            this.SgtinListTextBox.Name = "SgtinListTextBox";
+            this.SgtinListTextBox.Size = new System.Drawing.Size(243, 328);
+            this.SgtinListTextBox.TabIndex = 25;
             // 
             // label9
             // 
@@ -343,7 +343,7 @@ namespace Sender_10300_10311
             this.Controls.Add(this.LoadWODataButton);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.CountOfSgtinLoadBox);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.SgtinListTextBox);
             this.Controls.Add(this.LoadFromTxtButton);
             this.Controls.Add(this.Save2CsvButton);
             this.Controls.Add(this.label3);
@@ -367,7 +367,7 @@ namespace Sender_10300_10311
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Sender10311Form";
             this.Text = "Отправитель 10311";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.Sender10311Form_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -395,7 +395,7 @@ namespace Sender_10300_10311
         private System.Windows.Forms.TextBox sgtinBox;
         private System.Windows.Forms.Button Save2CsvButton;
         private System.Windows.Forms.Button LoadFromTxtButton;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox SgtinListTextBox;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox CountOfSgtinLoadBox;
         private System.Windows.Forms.Button LoadWODataButton;
