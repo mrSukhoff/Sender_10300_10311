@@ -10,24 +10,15 @@ namespace Sender_10300_10311
 {
     public partial class Sender10311Form : Form
     {
-        private string _antSerial;
-        private string _antGTIN;
         private int _countOfSgtinLoad = 1;
-        private string _workorderID;
  
         public Sender10311Form()
         {
             InitializeComponent();
         }
                 
-        private async Task LoadFromAntaresBySgtinAndFillFormAsync(string connectionString)
+        private async Task LoadFromAntaresDbAndFillFormAsync(string connectionString, string query)
         {
-            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
-            string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
-                $" FROM [Item_All_Crypto] as i" +
-                $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
-                $" WHERE Serial = '{_antSerial}' and Ntin = '{_antGTIN}'";
-
             using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
@@ -57,57 +48,8 @@ namespace Sender_10300_10311
                         ExpiredTextBox.Text = expDate;
 
                         ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
-
                         LotBox.Text = Convert.ToString(sqlReader["Lot"]);
-
                         _countOfSgtinLoad++;
-                    }
-                }
-            }
-        }
-
-        private async Task LoadFromAntaresByWorkorderAndFillFormAsync(string connectionString)
-        {
-            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[WorkOrderID] = '"+ _workorderID + "' and " + _antServerTable + "[Item_All_Crypto].[Type] = '100' and " + _antServerTable + "[Item_All_Crypto].[Status] in( '10','1') "
-            var query = "SELECT  i.Serial, i.Status, i.WorkOrderID, i.CryptoKey, i.CryptoCode, w.Expiry, i.Ntin, w.Lot, w.CloseTime" +
-                " FROM Item_All_Crypto as i  JOIN WorkOrder as ON w.Id = i.WorkOrderID" +
-                $" Where i.WorkOrderID = '{_workorderID} and i.Type = '100' and i.Status in( '10','1') ";
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand getAntaresCommand = new SqlCommand(query, connection);
-                using (SqlDataReader sqlReader = await getAntaresCommand.ExecuteReaderAsync())
-                {
-                    try
-                    {
-                        while (await sqlReader.ReadAsync())
-                        {
-                            ListViewItem item = new ListViewItem(new string[]{
-                            Convert.ToString(_countOfSgtinLoad),
-                            Convert.ToString(sqlReader["Ntin"]),
-                            Convert.ToString(sqlReader["Serial"]),
-                            Convert.ToString(sqlReader["CryptoKey"]),
-                            Convert.ToString(sqlReader["CryptoCode"]),
-                            Convert.ToString(sqlReader["Expiry"]),
-                            Convert.ToString(sqlReader["CloseTime"]),
-                            Convert.ToString(sqlReader["Lot"]),
-                            Convert.ToString(sqlReader["Status"])
-                        });
-                            SgtinListView.Items.Add(item);
-
-                            string expDate = Convert.ToString(sqlReader["Expiry"]);
-                            if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
-                            ExpiredTextBox.Text = expDate;
-
-                            ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
-                            LotBox.Text = Convert.ToString(sqlReader["Lot"]);
-                            _countOfSgtinLoad++;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -115,8 +57,6 @@ namespace Sender_10300_10311
 
         private async void ManualAddButton_Click(object sender, EventArgs e)
         {
-            _antGTIN = GtinBox.Text;
-            _antSerial = SerialNumberBox.Text;
             bool proverkaSerial = true;
 
             foreach (ListViewItem item in SgtinListView.Items)
@@ -133,9 +73,15 @@ namespace Sender_10300_10311
                 SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
                 SubjectIdBox.Text = subjectId;
 
+                //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
+                string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
+                    $" FROM [Item_All_Crypto] as i" +
+                    $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
+                    $" WHERE Serial = '{SerialNumberBox.Text}' and Ntin = '{GtinBox.Text}'";
+
                 try
                 {
-                    await LoadFromAntaresBySgtinAndFillFormAsync(connectionString);
+                    await LoadFromAntaresDbAndFillFormAsync(connectionString, query);
                 }
                 catch (Exception ex)
                 {
@@ -181,8 +127,6 @@ namespace Sender_10300_10311
             SerialNumberBox.Text = null;
             WorkorderIdTextBox.Text = null;
 
-            _antGTIN = null;
-            _antSerial = null;
             SubjectIdBox.Text = null;
             SgtinListTextBox.Text = null;
         }
@@ -230,15 +174,21 @@ namespace Sender_10300_10311
                             // Пишем считанную строку в итоговую переменную.
                             SgtinListTextBox.Text += temp + "\n";
 
-                            _antGTIN = temp.Substring(0, 14);
-                            _antSerial = temp.Substring(14, 13);
+                            var gtin = temp.Substring(0, 14);
+                            var serial = temp.Substring(14, 13);
 
                             SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
                             SubjectIdBox.Text = subjectId;
 
+                            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
+                            string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
+                                $" FROM [Item_All_Crypto] as i" +
+                                $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
+                                $" WHERE Serial = '{serial}' and Ntin = '{gtin}'";
+
                             try
                             {
-                                await LoadFromAntaresBySgtinAndFillFormAsync(connectionString);
+                                await LoadFromAntaresDbAndFillFormAsync(connectionString, query);
                             }
                             catch (Exception ex)
                             {
@@ -298,15 +248,19 @@ namespace Sender_10300_10311
             SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
             SubjectIdBox.Text = subjectId;
 
-            _workorderID = WorkorderIdTextBox.Text;
-            try
-            {
-                await LoadFromAntaresByWorkorderAndFillFormAsync(connectionString);
+            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[WorkOrderID] = '"+ _workorderID + "' and " + _antServerTable + "[Item_All_Crypto].[Type] = '100' and " + _antServerTable + "[Item_All_Crypto].[Status] in( '10','1') "
+            var query = "SELECT  i.Serial, i.Status, i.WorkOrderID, i.CryptoKey, i.CryptoCode, w.Expiry, i.Ntin, w.Lot, w.CloseTime" +
+                " FROM Item_All_Crypto as i  JOIN WorkOrder as ON w.Id = i.WorkOrderID" +
+                $" Where i.WorkOrderID = '{WorkorderIdTextBox.Text} and i.Type = '100' and i.Status in( '10','1') ";
+
+            try 
+            { 
+                await LoadFromAntaresDbAndFillFormAsync(connectionString, query);
             }
             catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            };
+            { 
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+            }
 
             CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
         }
