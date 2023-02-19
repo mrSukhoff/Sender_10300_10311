@@ -349,51 +349,52 @@ namespace Sender_10300_10311
                         // Если достигнут конец файла, прерываем считывание.
                         if (temp == null) break;
 
-                        if (temp != "" && temp.Length == 27) { 
-                        // Пишем считанную строку в итоговую переменную.
-                        textBox3.Text += temp + "\n";
+                        if (temp != "" && temp.Length == 27) 
+                        { 
+                            // Пишем считанную строку в итоговую переменную.
+                            textBox3.Text += temp + "\n";
                       
-                        //gtinBox.Text = antGTIN;
-                        //serialnumberBox.Text = antSerial;
-                        antGTIN = temp.Substring(0, 14);
-                        antSerial = temp.Substring(14, 13);
+                            //gtinBox.Text = antGTIN;
+                            //serialnumberBox.Text = antSerial;
+                            antGTIN = temp.Substring(0, 14);
+                            antSerial = temp.Substring(14, 13);
 
-                        if (ServerComboBox.Text == "Тестовый")
-                        {
-                            SubjectIdBox.Text = "00000000106567";
-                            sqlConnection = new SqlConnection("Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav");
-                            antServerTable = "[AntaresTracking_QA].[dbo].";
-                        }
+                            if (ServerComboBox.Text == "Тестовый")
+                            {
+                                SubjectIdBox.Text = "00000000106567";
+                                sqlConnection = new SqlConnection("Data Source=IRK-SQL-TST;Initial Catalog=AntaresTracking_QA;Persist Security Info=True;User ID=tav;Password=tav");
+                                antServerTable = "[AntaresTracking_QA].[dbo].";
+                            }
 
-                        if (ServerComboBox.Text == "Тюмень")
-                        {
-                            SubjectIdBox.Text = "00000000160656";
-                            sqlConnection = new SqlConnection("Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
-                            antServerTable = "[AntaresTracking_PRD].[dbo].";
-                        }
-                        if (ServerComboBox.Text == "Иркутск")
-                        {
-                            SubjectIdBox.Text = "00000000003013";
-                            sqlConnection = new SqlConnection("Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
-                            antServerTable = "[AntaresTracking_PRD].[dbo].";
-                        }
+                            if (ServerComboBox.Text == "Тюмень")
+                            {
+                                SubjectIdBox.Text = "00000000160656";
+                                sqlConnection = new SqlConnection("Data Source=TMN-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
+                                antServerTable = "[AntaresTracking_PRD].[dbo].";
+                            }
+                            if (ServerComboBox.Text == "Иркутск")
+                            {
+                                SubjectIdBox.Text = "00000000003013";
+                                sqlConnection = new SqlConnection("Data Source=IRK-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
+                                antServerTable = "[AntaresTracking_PRD].[dbo].";
+                            }
 
-                        if (ServerComboBox.Text == "Питер")
-                        {
-                            SubjectIdBox.Text = "00000000197244";
-                            sqlConnection = new SqlConnection("Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
-                            antServerTable = "[AntaresTracking_PRD].[dbo].";
-                        }
+                            if (ServerComboBox.Text == "Питер")
+                            {
+                                SubjectIdBox.Text = "00000000197244";
+                                sqlConnection = new SqlConnection("Data Source=SPB-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
+                                antServerTable = "[AntaresTracking_PRD].[dbo].";
+                            }
 
-                        if (ServerComboBox.Text == "Усурийск")
-                        {
-                            SubjectIdBox.Text = "00000000253549";
-                            sqlConnection = new SqlConnection("Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
-                            antServerTable = "[AntaresTracking_PRD].[dbo].";
-                        }
+                            if (ServerComboBox.Text == "Усурийск")
+                            {
+                                SubjectIdBox.Text = "00000000253549";
+                                sqlConnection = new SqlConnection("Data Source=USS-M1-SQL;Initial Catalog=AntaresTracking_PRD;Persist Security Info=True;User ID=tav;Password=tav");
+                                antServerTable = "[AntaresTracking_PRD].[dbo].";
+                            }
 
-                        await sqlConnection.OpenAsync();
-                        await LoadAntaresAsync();
+                            await sqlConnection.OpenAsync();
+                            await LoadAntaresAsync();
                         }
                         //   else { textBox3.Text += temp + "\n"; }
 
