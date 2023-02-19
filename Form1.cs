@@ -10,7 +10,6 @@ namespace Sender_10300_10311
 {
     public partial class Form1 : Form
     {
-
         private string _antSerial;
         private string _antGTIN;
         private string _antServerTable;
@@ -30,27 +29,23 @@ namespace Sender_10300_10311
             if (_sqlConnection != null && _sqlConnection.State != ConnectionState.Closed)
                 _sqlConnection.Close();
         }
-
         
-        private async Task LoadAntaresAsync() //SELECT
+        private async Task LoadFromAntaresBySgtinAndFillFormAsync() //SELECT
         {
-            SqlDataReader sqlReader;
-
             //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
             string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
                 $" FROM [Item_All_Crypto] as i" +
                 $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
-                $" WHERE Serial = '{_antSerial}' and Ntin = '{_antGTIN}'"; 
+                $" WHERE Serial = '{_antSerial}' and Ntin = '{_antGTIN}'";
             SqlCommand getAntaresCommand = new SqlCommand(query, _sqlConnection);
             
-            string expDate;
-            try
+            using (SqlDataReader sqlReader = await getAntaresCommand.ExecuteReaderAsync())
             {
-                sqlReader = await getAntaresCommand.ExecuteReaderAsync();
-                while (await sqlReader.ReadAsync())
+                try
                 {
-                    var item = new ListViewItem(
-                        new string[]
+                    while (await sqlReader.ReadAsync())
+                    {
+                        SgtinListView.Items.Add(new ListViewItem(new string[]
                         {
                             Convert.ToString(_countOfSgtinLoad),
                             Convert.ToString(sqlReader["Ntin"]),
@@ -61,102 +56,74 @@ namespace Sender_10300_10311
                             Convert.ToString(sqlReader["CloseTime"]),
                             Convert.ToString(sqlReader["Lot"]),
                             Convert.ToString(sqlReader["Status"])
-                        });
-                _countOfSgtinLoad++;
-                listView1.Items.Add(item);
+                        }));
 
-                expDate = Convert.ToString(sqlReader["Expiry"]);
-                //manufacturedData = Convert.ToString(sqlReader["CloseTime"]);
-                   
-                if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
-                ExpiredTextBox.Text = expDate;
-                ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
-                //if (manufacturedData != "") { manufacturedData = manufacturedData.Substring(6, 2) + "." + manufacturedData.Substring(4, 2) + "." + manufacturedData.Substring(0, 4); }
-                    // textBox1.Text = manufacturedData;
-                LotBox.Text = Convert.ToString(sqlReader["Lot"]);
+                        var expDate = Convert.ToString(sqlReader["Expiry"]);
+                        if (expDate != "")
+                        {
+                            expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4);
+                        }
+                        ExpiredTextBox.Text = expDate;
 
+                        ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
+
+                        LotBox.Text = Convert.ToString(sqlReader["Lot"]);
+
+                        _countOfSgtinLoad++;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                if (sqlReader != null && !sqlReader.IsClosed)
+                catch (Exception ex)
                 {
-                    sqlReader.Close();
+                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
         }
 
-        private async Task LoadAntaresAsync1() //SELECT
+        private async Task LoadFromAntaresByWorkorderAndFillFormAsync() //SELECT
         {
-            string expDate, manufacturedData = null;
-            SqlDataReader sqlReader = null;
-            //SqlCommand getAntaresCommand = new SqlCommand("SELECT [Serial] ,[CryptoKey], [CryptoCode] ,[Ntin],[Expiry] FROM " + antServerTable + " where Serial =" + "'" + antSerial + "'" + "and Ntin = " + "'" + antGTIN + "'", sqlConnection);
+            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[WorkOrderID] = '"+ _workorderID + "' and " + _antServerTable + "[Item_All_Crypto].[Type] = '100' and " + _antServerTable + "[Item_All_Crypto].[Status] in( '10','1') "
+            var query = "SELECT  i.Serial, i.Status, i.WorkOrderID, i.CryptoKey, i.CryptoCode, w.Expiry, i.Ntin, w.Lot, w.CloseTime" +
+                " FROM Item_All_Crypto as i  JOIN WorkOrder as ON w.Id = i.WorkOrderID" +
+                $" Where i.WorkOrderID = '{_workorderID} and i.Type = '100' and i.Status in( '10','1') ";
 
-            SqlCommand getAntaresCommand = new SqlCommand("SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[WorkOrderID] = '"+ _workorderID + "' and " + _antServerTable + "[Item_All_Crypto].[Type] = '100' and " + _antServerTable + "[Item_All_Crypto].[Status] in( '10','1') ", _sqlConnection);
+            SqlCommand getAntaresCommand = new SqlCommand(query, _sqlConnection);
 
-
-
-
-            try
+            using (SqlDataReader sqlReader = await getAntaresCommand.ExecuteReaderAsync())
             {
-                sqlReader = await getAntaresCommand.ExecuteReaderAsync();
-                while (await sqlReader.ReadAsync())
+                try
                 {
+                    while (await sqlReader.ReadAsync())
+                    {
+                        ListViewItem item = new ListViewItem(new string[]{
+                            Convert.ToString(_countOfSgtinLoad),
+                            Convert.ToString(sqlReader["Ntin"]),
+                            Convert.ToString(sqlReader["Serial"]),
+                            Convert.ToString(sqlReader["CryptoKey"]),
+                            Convert.ToString(sqlReader["CryptoCode"]),
+                            Convert.ToString(sqlReader["Expiry"]),
+                            Convert.ToString(sqlReader["CloseTime"]),
+                            Convert.ToString(sqlReader["Lot"]),
+                            Convert.ToString(sqlReader["Status"])
+                        });
+                        SgtinListView.Items.Add(item);
 
+                        string expDate = Convert.ToString(sqlReader["Expiry"]);
+                        if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
+                        ExpiredTextBox.Text = expDate;
 
-
-                    ListViewItem item = new ListViewItem(new string[]{
-                    Convert.ToString(_countOfSgtinLoad),
-                    Convert.ToString(sqlReader["Ntin"]),
-                    Convert.ToString(sqlReader["Serial"]),
-                    Convert.ToString(sqlReader["CryptoKey"]),
-                    Convert.ToString(sqlReader["CryptoCode"]),
-                    Convert.ToString(sqlReader["Expiry"]),
-                    Convert.ToString(sqlReader["CloseTime"]),
-                    Convert.ToString(sqlReader["Lot"]),
-                    Convert.ToString(sqlReader["Status"])
-
-
-                });
-                    _countOfSgtinLoad++;
-
-                    listView1.Items.Add(item);
-
-
-                    expDate = Convert.ToString(sqlReader["Expiry"]);
-                    //manufacturedData = Convert.ToString(sqlReader["CloseTime"]);
-
-                    if (expDate != "") { expDate = expDate.Substring(6, 2) + "." + expDate.Substring(4, 2) + "." + expDate.Substring(0, 4); }
-                    ExpiredTextBox.Text = expDate;
-                    ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
-                    //if (manufacturedData != "") { manufacturedData = manufacturedData.Substring(6, 2) + "." + manufacturedData.Substring(4, 2) + "." + manufacturedData.Substring(0, 4); }
-                    // textBox1.Text = manufacturedData;
-                    LotBox.Text = Convert.ToString(sqlReader["Lot"]);
-
+                        ManufacturingDateBox.Text = Convert.ToString(sqlReader["CloseTime"]);
+                        LotBox.Text = Convert.ToString(sqlReader["Lot"]);
+                        _countOfSgtinLoad++;
+                    }
                 }
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                if (sqlReader != null && !sqlReader.IsClosed)
+                catch (Exception ex)
                 {
-                    sqlReader.Close();
+                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void ManualAddButton_Click(object sender, EventArgs e)
         {
           //  antGTIN = null;
             //antSerial = null;
@@ -168,7 +135,7 @@ namespace Sender_10300_10311
 
             // antGTIN = "04605310007822";
             //antSerial = "0000000078987";
-            foreach (ListViewItem item in listView1.Items)
+            foreach (ListViewItem item in SgtinListView.Items)
             {
 
                 if (item.SubItems[2].Text == SerialNumberBox.Text)
@@ -219,7 +186,7 @@ namespace Sender_10300_10311
 
 
                 await _sqlConnection.OpenAsync();
-                await LoadAntaresAsync();
+                await LoadFromAntaresBySgtinAndFillFormAsync();
                 CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
             }
 
@@ -230,21 +197,21 @@ namespace Sender_10300_10311
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            listView1.GridLines = true;
-            listView1.FullRowSelect = true;
-            listView1.View = View.Details;
-            listView1.Columns.Add("№", 20);
-            listView1.Columns.Add("GTIN",120);
-            listView1.Columns.Add("Серийный Номер", 120);
-            listView1.Columns.Add("Крипто ключ", 100);
-            listView1.Columns.Add("Криптокод", 300);
-            listView1.Columns.Add("Срок годности", 100);
-            listView1.Columns.Add("Дата производства", 100);
-            listView1.Columns.Add("Лот", 80);
-            listView1.Columns.Add("Статус", 80);
+            SgtinListView.GridLines = true;
+            SgtinListView.FullRowSelect = true;
+            SgtinListView.View = View.Details;
+            SgtinListView.Columns.Add("№", 20);
+            SgtinListView.Columns.Add("GTIN",120);
+            SgtinListView.Columns.Add("Серийный Номер", 120);
+            SgtinListView.Columns.Add("Крипто ключ", 100);
+            SgtinListView.Columns.Add("Криптокод", 300);
+            SgtinListView.Columns.Add("Срок годности", 100);
+            SgtinListView.Columns.Add("Дата производства", 100);
+            SgtinListView.Columns.Add("Лот", 80);
+            SgtinListView.Columns.Add("Статус", 80);
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ServerComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             
             
@@ -253,7 +220,7 @@ namespace Sender_10300_10311
             ManufacturingDateBox.Text = null;
             ExpiredTextBox.Text = null;
             LotBox.Text = null;
-            listView1.Items.Clear();
+            SgtinListView.Items.Clear();
             ManualAddButton.Enabled = true;
             LoadFromTxtButton.Enabled = true;
             LoadWODataButton.Enabled = true;
@@ -272,12 +239,7 @@ namespace Sender_10300_10311
 
         }
 
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private async void button2_Click(object sender, EventArgs e)
+        private async void Save2CsvButton_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog sdf = new SaveFileDialog() { Filter = "CSV|*.CSV", FileName = LotBox.Text})
             {
@@ -286,7 +248,7 @@ namespace Sender_10300_10311
                     using (StreamWriter sw = new StreamWriter(new FileStream(sdf.FileName, FileMode.Create), Encoding.UTF8))
                     {
                         StringBuilder sb = new StringBuilder();
-                        foreach(ListViewItem item in listView1.Items)
+                        foreach(ListViewItem item in SgtinListView.Items)
                         {
                             sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text );
                         }
@@ -297,16 +259,11 @@ namespace Sender_10300_10311
             }
         }
 
-        private void listView2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private async void button3_Click(object sender, EventArgs e)
+        private async void LoadFromTxtButton_Click(object sender, EventArgs e)
         {
             textBox3.Text = null;
             //string aaaa = "046200178611260000000331387";
-            listView1.Items.Clear();
+            SgtinListView.Items.Clear();
             using (OpenFileDialog openFileDialog1 = new OpenFileDialog() { Filter = "TXT|*.TXT" })
             { 
                 if (openFileDialog1.ShowDialog() == DialogResult.Cancel) { return; }
@@ -382,7 +339,7 @@ namespace Sender_10300_10311
                         }
 
                         await _sqlConnection.OpenAsync();
-                        await LoadAntaresAsync();
+                        await LoadFromAntaresBySgtinAndFillFormAsync();
                         }
                         //   else { textBox3.Text += temp + "\n"; }
 
@@ -401,7 +358,7 @@ namespace Sender_10300_10311
 
                 }
 
-                foreach (ListViewItem item in listView1.Items)
+                foreach (ListViewItem item in SgtinListView.Items)
                 {
 
                     if (item.SubItems[7].Text != LotBox.Text)
@@ -427,13 +384,13 @@ namespace Sender_10300_10311
             }
         }
 
-        private async void  button4_Click(object sender, EventArgs e)
+        private async void  LoadWODataButton_Click(object sender, EventArgs e)
         {
 
             ManufacturingDateBox.Text = null;
             ExpiredTextBox.Text = null;
             LotBox.Text = null;
-            listView1.Items.Clear();
+            SgtinListView.Items.Clear();
             ManualAddButton.Enabled = true;
             LoadFromTxtButton.Enabled = true;
             LoadWODataButton.Enabled = true;
@@ -481,19 +438,9 @@ namespace Sender_10300_10311
                 _workorderID = WorkorderIdTextBox.Text;
 
                 await _sqlConnection.OpenAsync();
-                await LoadAntaresAsync1();
+                await LoadFromAntaresByWorkorderAndFillFormAsync();
                 CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
             
-        }
-
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
