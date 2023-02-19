@@ -154,70 +154,70 @@ namespace Sender_10300_10311
         {
             SgtinListTextBox.Text = null;
             SgtinListView.Items.Clear();
-            using (OpenFileDialog openFileDialog1 = new OpenFileDialog() { Filter = "TXT|*.TXT" })
-            { 
-                if (openFileDialog1.ShowDialog() == DialogResult.Cancel) { return; }
-                int countOfSgtinLoadErr = 0;
-                using (StreamReader fs = new StreamReader(openFileDialog1.FileName))
+
+            OpenFileDialog openFileDialog = new OpenFileDialog() { Filter = "TXT|*.TXT" };
+            if (openFileDialog.ShowDialog() == DialogResult.Cancel) { return; }
+                
+            int countOfSgtinLoadErr = 0;
+            
+            using (StreamReader fs = new StreamReader(openFileDialog.FileName))
+            {
+                _countOfSgtinLoad = 1;
+
+                while (!fs.EndOfStream)
                 {
-                    _countOfSgtinLoad = 1;
+                    // Читаем строку из файла во временную переменную.
+                    string temp = fs.ReadLine();
 
-                    while (true)
+                    if (temp != "" && temp.Length == 27)
                     {
-                        // Читаем строку из файла во временную переменную.
-                        string temp = fs.ReadLine();
-                        // Если достигнут конец файла, прерываем считывание.
-                        if (temp == null) break;
+                        // Пишем считанную строку в итоговую переменную.
+                        SgtinListTextBox.Text += temp + '\n';
 
-                        if (temp != "" && temp.Length == 27)
+                        var gtin = temp.Substring(0, 14);
+                        var serial = temp.Substring(14, 13);
+
+                        SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
+                        //SubjectIdBox.Text = subjectId;
+
+                        //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
+                        string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
+                            $" FROM [Item_All_Crypto] as i" +
+                            $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
+                            $" WHERE Serial = '{serial}' and Ntin = '{gtin}'";
+
+                        try
                         {
-                            // Пишем считанную строку в итоговую переменную.
-                            SgtinListTextBox.Text += temp + "\n";
-
-                            var gtin = temp.Substring(0, 14);
-                            var serial = temp.Substring(14, 13);
-
-                            SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
-                            SubjectIdBox.Text = subjectId;
-
-                            //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
-                            string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
-                                $" FROM [Item_All_Crypto] as i" +
-                                $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
-                                $" WHERE Serial = '{serial}' and Ntin = '{gtin}'";
-
-                            try
-                            {
-                                await LoadFromAntaresDbAndFillFormAsync(connectionString, query);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            };
-
-                            if (temp != "") { countOfSgtinLoadErr++; }
+                            await LoadFromAntaresDbAndFillFormAsync(connectionString, query);
                         }
-
-                        CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
-                        if (_countOfSgtinLoad - 1 == countOfSgtinLoadErr)
+                        catch (Exception ex)
                         {
-                            MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr));
-                        }
-                        else { MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr) + "\n Проверьте длину SGTIN"); }
+                            MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        };
 
+                        if (temp != "") { countOfSgtinLoadErr++; }
                     }
 
-                    foreach (ListViewItem item in SgtinListView.Items)
+                    CountOfSgtinLoadBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
+                    if (_countOfSgtinLoad - 1 == countOfSgtinLoadErr)
                     {
+                        MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr));
+                    }
+                    else { MessageBox.Show("Загружено " + Convert.ToString(_countOfSgtinLoad - 1) + " SGTIN из " + Convert.ToString(countOfSgtinLoadErr) + "\n Проверьте длину SGTIN"); }
 
-                        if (item.SubItems[7].Text != LotBox.Text)
-                        {
-                            MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + LotBox.Text);
-                            break;
-                        }
+                }
+
+                foreach (ListViewItem item in SgtinListView.Items)
+                {
+
+                    if (item.SubItems[7].Text != LotBox.Text)
+                    {
+                        MessageBox.Show("Проверьте файл, Некоторые SGTIN не из серии " + LotBox.Text);
+                        break;
                     }
                 }
             }
+
         }
 
         private void SgtinBox_TextChanged(object sender, EventArgs e)
