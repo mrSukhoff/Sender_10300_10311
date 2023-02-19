@@ -51,7 +51,7 @@ namespace Sender_10300_10311
             this.LoadFromTxtButton = new System.Windows.Forms.Button();
             this.SgtinListTextBox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.CountOfSgtinLoadBox = new System.Windows.Forms.TextBox();
+            this.CountOfLoadedSgtinBox = new System.Windows.Forms.TextBox();
             this.LoadWODataButton = new System.Windows.Forms.Button();
             this.WorkorderIdTextBox = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -292,14 +292,14 @@ namespace Sender_10300_10311
             this.label9.TabIndex = 27;
             this.label9.Text = "Счетчик";
             // 
-            // CountOfSgtinLoadBox
+            // CountOfLoadedSgtinBox
             // 
-            this.CountOfSgtinLoadBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.CountOfSgtinLoadBox.Location = new System.Drawing.Point(499, 311);
-            this.CountOfSgtinLoadBox.Margin = new System.Windows.Forms.Padding(4);
-            this.CountOfSgtinLoadBox.Name = "CountOfSgtinLoadBox";
-            this.CountOfSgtinLoadBox.Size = new System.Drawing.Size(253, 24);
-            this.CountOfSgtinLoadBox.TabIndex = 26;
+            this.CountOfLoadedSgtinBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.CountOfLoadedSgtinBox.Location = new System.Drawing.Point(499, 311);
+            this.CountOfLoadedSgtinBox.Margin = new System.Windows.Forms.Padding(4);
+            this.CountOfLoadedSgtinBox.Name = "CountOfLoadedSgtinBox";
+            this.CountOfLoadedSgtinBox.Size = new System.Drawing.Size(253, 24);
+            this.CountOfLoadedSgtinBox.TabIndex = 26;
             // 
             // LoadWODataButton
             // 
@@ -342,7 +342,7 @@ namespace Sender_10300_10311
             this.Controls.Add(this.WorkorderIdTextBox);
             this.Controls.Add(this.LoadWODataButton);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.CountOfSgtinLoadBox);
+            this.Controls.Add(this.CountOfLoadedSgtinBox);
             this.Controls.Add(this.SgtinListTextBox);
             this.Controls.Add(this.LoadFromTxtButton);
             this.Controls.Add(this.Save2CsvButton);
@@ -367,7 +367,6 @@ namespace Sender_10300_10311
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Sender10311Form";
             this.Text = "Отправитель 10311";
-            this.Load += new System.EventHandler(this.Sender10311Form_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -397,7 +396,7 @@ namespace Sender_10300_10311
         private System.Windows.Forms.Button LoadFromTxtButton;
         private System.Windows.Forms.TextBox SgtinListTextBox;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox CountOfSgtinLoadBox;
+        private System.Windows.Forms.TextBox CountOfLoadedSgtinBox;
         private System.Windows.Forms.Button LoadWODataButton;
         private System.Windows.Forms.TextBox WorkorderIdTextBox;
         private System.Windows.Forms.Label label10;
