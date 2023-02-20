@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Sender_10300_10311
 {
@@ -126,7 +128,7 @@ namespace Sender_10300_10311
             
             using (StreamReader fs = new StreamReader(openFileDialog.FileName))
             {
-                int countOfSgtinLoad = 1;
+                int _countOfSgtinLoad = 1;
 
                 while (!fs.EndOfStream)
                 {
@@ -186,7 +188,6 @@ namespace Sender_10300_10311
 
         private async void  LoadWODataButton_Click(object sender, EventArgs e)
         {
-
             ManufacturingDateBox.Text = null;
             ExpiredTextBox.Text = null;
             LotBox.Text = null;
@@ -194,11 +195,12 @@ namespace Sender_10300_10311
             ManualAddButton.Enabled = true;
             LoadFromTxtButton.Enabled = true;
             LoadWODataButton.Enabled = true;
-            _countOfSgtinLoad = 1;
             CountOfLoadedSgtinBox.Text = "0";
             sgtinBox.Text = null;
             GtinBox.Text = null;
             SerialNumberBox.Text = null;
+
+            _countOfSgtinLoad = 1;
 
             SelectServer(ServerComboBox.Text, out string subjectId, out string connectionString);
             SubjectIdBox.Text = subjectId;
@@ -220,7 +222,8 @@ namespace Sender_10300_10311
             CountOfLoadedSgtinBox.Text = Convert.ToString(_countOfSgtinLoad - 1);
         }
 
-        private async Task LoadFromAntaresDbAndFillFormAsync(string connectionString, string query)
+        /*
+         private async Task LoadFromAntaresDbAndFillFormAsync(string connectionString, string query)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -257,6 +260,57 @@ namespace Sender_10300_10311
                 }
             }
         }
+         
+        */
+        private async Task LoadFromAntaresDbAndFillFormAsync(string connectionString, string query)
+        {
+            List<Sgtin> sgitins = await GetDataFromDb(connectionString, query);
+            
+            foreach (Sgtin sgtin in sgitins)
+            {
+                SgtinListView.Items.Add(new ListViewItem(sgtin.ToString()));
+            }
+            if (sgitins.Count > 0)
+            {
+                ExpiredTextBox.Text = sgitins[0].Expiry;
+                ManufacturingDateBox.Text = sgitins[0].CloseTime;
+                LotBox.Text = sgitins[0].Lot;
+            }
+            CountOfLoadedSgtinBox.Text = sgitins.Count.ToString();
+        }
+
+        private async Task<List<Sgtin>> GetDataFromDb(string connectionString, string query)
+        {
+            List<Sgtin> result = new List<Sgtin>; 
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                SqlCommand getAntaresCommand = new SqlCommand(query, connection);
+                using (SqlDataReader sqlReader = await getAntaresCommand.ExecuteReaderAsync())
+                {
+                    while (await sqlReader.ReadAsync())
+                    {
+                        Sgtin sgtin = new Sgtin
+                        {
+                            Ntin = Convert.ToString(sqlReader["Ntin"]),
+                            Serial = Convert.ToString(sqlReader["Serial"]),
+                            CryptoKey = Convert.ToString(sqlReader["CryptoKey"]),
+                            CryptoCode = Convert.ToString(sqlReader["CryptoCode"]),
+                            Expiry = Convert.ToString(sqlReader["Expiry"]),
+                            CloseTime = Convert.ToString(sqlReader["CloseTime"]),
+                            Lot = Convert.ToString(sqlReader["Lot"]),
+                            Status = Convert.ToString(sqlReader["Status"])
+                        };
+                        if (sgtin.Expiry != "")
+                        {
+                            sgtin.Expiry = sgtin.Expiry.Substring(6, 2) + "." + sgtin.Expiry.Substring(4, 2) + "." + sgtin.Expiry.Substring(0, 4);
+                        }
+                        result.Add(sgtin);
+                    }
+                }
+            }
+            return result;
+        }
 
         private void SelectServer(string ServerName, out string SubjectId, out string ConnectionString) 
         {
@@ -289,4 +343,17 @@ namespace Sender_10300_10311
             }
         }
     }
+
+    public struct Sgtin
+    {
+        public string Ntin;
+        public string Serial;
+        public string CryptoKey;
+        public string CryptoCode;
+        public string Expiry;
+        public string CloseTime;
+        public string Lot;
+        public string Status;
+    }
+
 }
