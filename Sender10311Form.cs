@@ -108,7 +108,7 @@ namespace Sender_10300_10311
                 StringBuilder sb = new StringBuilder();
                 foreach(ListViewItem item in SgtinListView.Items)
                 {
-                    sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text );
+                    sb.AppendLine("01" + item.SubItems[1].Text + "21" + item.SubItems[2].Text + "91" + item.SubItems[3].Text + "92" + item.SubItems[4].Text);
                 }
                 await sw.WriteLineAsync(sb.ToString());
             }
@@ -145,7 +145,7 @@ namespace Sender_10300_10311
                         //SubjectIdBox.Text = subjectId;
 
                         //"SELECT  " + _antServerTable + "[Item_All_Crypto].[Serial] ," + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[Status], " + _antServerTable + "[Item_All_Crypto].[WorkOrderID], " + _antServerTable + "[Item_All_Crypto].[CryptoKey], " + _antServerTable + "[Item_All_Crypto].[CryptoCode], " + _antServerTable + "[WorkOrder].[Expiry], " + _antServerTable + "[Item_All_Crypto].[Ntin]," + _antServerTable + "[WorkOrder].[Lot]," + _antServerTable + "[WorkOrder].[CloseTime] FROM [Item_All_Crypto]  JOIN [WorkOrder]ON [WorkOrder].[Id] = [Item_All_Crypto].[WorkOrderID] Where " + _antServerTable + "[Item_All_Crypto].[Serial] = " + "'" + _antSerial + "'" + " and " + _antServerTable + "[Item_All_Crypto].[Ntin] = " + "'" + _antGTIN + "'"
-                        string query = $"SELECT i.[Serial], i.[Status], i.[WorkOrderID], i.[CryptoKey], i.[CryptoCode], w.[Expiry], [Ntin], w.[Lot], w.[CloseTime]" +
+                        string query = $"SELECT i.Serial, i.Status, i.WorkOrderID, i.CryptoKey, i.CryptoCode, w.Expiry, i.Ntin, w.Lot, w.CloseTime" +
                             $" FROM [Item_All_Crypto] as i" +
                             $" JOIN [WorkOrder] as w ON w.Id = i.WorkOrderID " +
                             $" WHERE Serial = '{serial}' and Ntin = '{gtin}'";
